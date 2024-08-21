@@ -62,13 +62,14 @@ class Menu(object):
                 result.extend(self.get_flat_name_list(menu=item.childs, result=result))
         return result
 
-    def get_data(self, menu=None):
+    def get_data(self, menu=None, allowed_menus=None):
         menu = menu or self.menu
         ret_list = []
 
-        allowed_menus = current_app.appbuilder.sm.get_user_menu_access(
-            self.get_flat_name_list()
-        )
+        if not allowed_menus:
+            allowed_menus = current_app.appbuilder.sm.get_user_menu_access(
+                self.get_flat_name_list()
+            )
 
         for i, item in enumerate(menu):
             if not item.should_render():
@@ -84,7 +85,7 @@ class Menu(object):
                         "name": item.name,
                         "icon": item.icon,
                         "label": __(str(item.label)),
-                        "childs": self.get_data(menu=item.childs),
+                        "childs": self.get_data(menu=item.childs, allowed_menus=allowed_menus),
                     }
                 )
             else:
